@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+       <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+       <title>My Webgl Test</title>
+	   <script type="text/javascript" src="Cube_Script.js"></script>
+	   <script type="text/javascript" src="m4.js"></script>
+	   <script type="text/javascript" src="glmatrix/dist/gl-matrix.js"></script>
+	   <script id="2d-vertex-shader" type="notjs">
+	        attribute vec3 a_position;
+			attribute vec2 a_uv;
+			attribute vec3 a_normals;
+			
+			varying vec3 v_Lighting;
+			varying vec2 v_UV;
+			
+			uniform mat4 u_NormalMatrix;
+            uniform mat4 u_Pmatrix;
+            uniform mat4 u_Vmatrix;
+			uniform mat4 u_Mmatrix;
+
+            void main(void) { 
+               gl_Position = u_Pmatrix*u_Vmatrix*u_Mmatrix*vec4(a_position, 1.0);
+			   v_UV = a_uv;
+			   
+				vec3 ambientLight = vec3(1.0, 1.0, 1.0);
+				vec3 directionalLightColor = vec3(1.0, 0.0, 0.0);
+				vec3 directionalVector = vec3(0.4, 0.2, 0.3);
+				
+				vec4 transformedNormal = u_NormalMatrix * vec4(a_normals, 1.0);
+				
+				float directional = max(dot(transformedNormal.xyz, directionalVector), 0.0);
+				v_Lighting = ambientLight + (directionalLightColor * directional); 
+            }
+			
+		</script>
+		<script id="2d-fragment-shader" type="notjs">
+				precision mediump float;
+				uniform sampler2D u_sampler;
+				varying vec2 v_UV;
+				varying vec3 v_Lighting;
+				
+
+
+				void main(void) {
+				   vec4 texelColor = texture2D(u_sampler, v_UV);
+				   gl_FragColor = vec4(texelColor.rgb * v_Lighting, texelColor.a);
+				   
+				}
+				
+		</script>  
+	   <style>
+	   
+		 body {
+			border: 0;
+			background-color:white;
+		  }
+		
+		 canvas {
+			 display: block;  /* prevents scrollbar */
+			 width: 98vw;
+			 height: 98vh;
+		  }
+		</style>
+    </head>
+    <body>
+     <canvas id="canvas"></canvas>
+    </body>
+	</html> 
